@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   Animated,
   Easing,
-  Alert
+  Alert,
+  Button
 } from 'react-native';
 
 function moveObjectOnArr(arr, _indexOf, _indexMoveTo){
@@ -50,16 +51,18 @@ export default function App() {
   }, [passwords]);
 
   const onPressNumber = (num) => {
-    let tempPassCode = [...passwords];
-    for (var i = 0; i < tempPassCode.length; i++) {
-      if (tempPassCode[i] == '') {
-        tempPassCode[i] = num;
-        break;
-      }else {
-        continue;
+    if(!wrong){
+      let tempPassCode = [...passwords];
+      for (var i = 0; i < tempPassCode.length; i++) {
+        if (tempPassCode[i] == '') {
+          tempPassCode[i] = num;
+          break;
+        }else {
+          continue;
+        }
       }
+      setPassword(tempPassCode);
     }
-    setPassword(tempPassCode);
   };
 
   const onPressBack = (num) => {
@@ -97,8 +100,7 @@ export default function App() {
       );
     }
     return (
-      <TouchableOpacity
-        onPress={() => onPressNumber(item.number)}
+      <View
         style={{
           // flex: 1,
           alignItems: 'center',
@@ -110,10 +112,16 @@ export default function App() {
           justifyContent: 'center',
           alignItems: 'center',
         }}
-        disabled={wrong ? true : false}
+        onStartShouldSetResponder={() => onPressNumber(item.number)}
+        pointerEvents={wrong ? 'none' : 'auto'}
       >
         <Text style={{ color: 'black', fontSize: 24 }}>{item.number}</Text>
-      </TouchableOpacity>
+        {/* <Button 
+          title={item.number}
+          onPress={() => onPressNumber(item.number)} 
+          disabled={wrong ? true : false}
+        /> */}
+      </View>
     );
   };
 
@@ -134,9 +142,7 @@ export default function App() {
   console.log(passwords.join(''));
 
   const handleSubmitPassCode = () => {
-    // CallApi here
     const passCodeStringVal = passwords.join('');
-    // alert(passCodeStringVal)
     if (passwords.join('') != 123456) {
       setWrong(true);
       runAnimation();
@@ -153,8 +159,6 @@ export default function App() {
   const shake = useRef(new Animated.Value(0)).current;
 
   const [wrong, setWrong] = useState(false);
-
-  const [rippleOverflow, setRippleOverflow] = useState(false);
 
   const translateXAnim = shake.interpolate({
     inputRange: [0, .4, .8, 1.2, 1.6, 2],
